@@ -40,8 +40,26 @@
         </property>
     </bean>
 
-    <bean id="transactionManager"  class="org.springframework.orm.hibernate4.HibernateTransactionManager">
-        <property name="sessionFactory" ref="sessionFactory" />
+    <!-- what 'happens' -->
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <!-- the transactional semantics... -->
+        <tx:attributes>
+            <!-- all methods starting with 'get' are read-only -->
+            <tx:method name="get*" read-only="true"/>
+            <!-- other methods use the default transaction settings (see below) -->
+            <tx:method name="*"/>
+        </tx:attributes>
+    </tx:advice>
+
+
+    <!-- when 'happens' -->
+    <aop:config>
+        <aop:pointcut id="orderService" expression="execution(* com.stud.st.service.OrderService.*(..))"/>
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="orderService"/>
+    </aop:config>
+
+    <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
 
     <bean id="persistenceExceptionTranslationPostProcessor"
