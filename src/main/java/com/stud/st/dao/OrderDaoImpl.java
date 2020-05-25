@@ -32,7 +32,7 @@ public class OrderDaoImpl implements OrderDao {
     @Override
     @Transactional
     public Order getOrder(int id) {
-        log.info("getOrders(): BEGIN");
+        log.info("getOrder(): BEGIN");
         Criteria criteria = getSession().createCriteria(Order.class);
         criteria.add(Restrictions.eq("id", id));
         Order order = ((List<Order>)criteria.list()).get(0);
