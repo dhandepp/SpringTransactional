@@ -33,20 +33,20 @@ public class PizzaDaoImpl implements PizzaDao {
     @Override
     @Transactional
     public Pizza addPizza(Pizza pizza) {
-        log.info("getPizzas(): BEGIN");
+        log.info("addPizza(): BEGIN");
         getSession().persist(pizza);
-        log.info("getPizzas(): END");
+        log.info("addPizza(): END");
         return pizza;
     }
 
     @Override
     @Transactional
     public Pizza getPizza(int id) {
-        log.info("getPizzas(): BEGIN");
+        log.info("getPizza(): BEGIN");
         Criteria criteria = getSession().createCriteria(Pizza.class);
         criteria.add(Restrictions.eq("id", id));
         Pizza pizza = ((List<Pizza>)criteria.list()).get(0);
-        log.info("getPizzas(): END");
+        log.info("getPizza(): END");
         return pizza;
     }
 

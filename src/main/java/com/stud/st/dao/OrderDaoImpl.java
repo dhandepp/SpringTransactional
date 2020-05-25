@@ -43,9 +43,9 @@ public class OrderDaoImpl implements OrderDao {
     @Override
     @Transactional
     public Order placeOrder(Order order) {
-        log.info("getOrders(): BEGIN");
+        log.info("placeOrder(): BEGIN");
         getSession().persist(order);
-        log.info("getOrder(): END");
+        log.info("placeOrder(): END");
         return order;
     }
 
