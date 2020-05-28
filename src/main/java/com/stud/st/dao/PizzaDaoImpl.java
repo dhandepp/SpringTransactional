@@ -9,6 +9,7 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -21,38 +22,64 @@ public class PizzaDaoImpl implements PizzaDao {
     SessionFactory sessionFactory;
 
     @Override
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public List<Pizza> getPizzas() {
         log.info("getPizzas(): BEGIN");
         Criteria criteria = getSession().createCriteria(Pizza.class);
+        criteria.add(Restrictions.lt("price", 500));
         List<Pizza> result = (List<Pizza>)criteria.list();
+        log.info("getPizzas(): result={}", result);
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         log.info("getPizzas(): END");
+        result = (List<Pizza>) criteria.list();
+        log.info("getPizzas(): again result={}", result);
         return result;
     }
 
     @Override
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public Pizza addPizza(Pizza pizza) {
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         log.info("addPizza(): BEGIN");
         getSession().persist(pizza);
-        log.info("addPizza(): END");
+        log.info("addPizza(): END pizza={}", pizza);
         return pizza;
     }
 
     @Override
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public Pizza getPizza(int id) {
         log.info("getPizza(): BEGIN");
         Criteria criteria = getSession().createCriteria(Pizza.class);
-        criteria.add(Restrictions.eq("id", id));
+        criteria.add(Restrictions.lt("price", 500));
         Pizza pizza = ((List<Pizza>)criteria.list()).get(0);
         log.info("getPizza(): END");
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        ((List<Pizza>)criteria.list()).get(0);
+
         return pizza;
     }
 
     @Override
     @Transactional
     public Pizza updatePizza(int id, Pizza pizza) {
+        log.info("updatePizza(): BEGIN");
+        getSession().update(pizza);
+        log.info("updatePizza(): END");
         return pizza;
     }
 

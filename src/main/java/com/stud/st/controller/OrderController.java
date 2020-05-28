@@ -3,18 +3,27 @@ package com.stud.st.controller;
 import com.stud.st.model.Order;
 import com.stud.st.model.Pizza;
 import com.stud.st.service.OrderService;
+import com.stud.st.service.PizzaService;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 
 @RestController
 @RequestMapping("/pizzeria")
 public class OrderController {
+    private final Logger log = LoggerFactory.getLogger(OrderController.class);
+
     @Autowired
     OrderService orderService;
+
+    @Autowired
+    PizzaService pizzaService;
 
     @GetMapping(value = "/orders", consumes = "application/json")
     public List<Order> getOrders() {
@@ -29,5 +38,41 @@ public class OrderController {
     @PostMapping(value = "/orders", consumes = "application/json")
     public Order placeOrder(@RequestBody List<Map<String, Integer>> orderDetails) {
         return orderService.placeOrder(orderDetails);
+    }
+
+    @GetMapping(value = "/foo")
+    public List<Pizza> foo() throws InterruptedException {
+
+        FutureTask getPizzasTask = new FutureTask(()-> pizzaService.getPizzas());
+
+        Thread getPizzaThread = new Thread(getPizzasTask, "getPizzas");
+
+        Thread addPizzaThread = new Thread(() -> {
+           Pizza pizza = new Pizza();
+           pizza.setName(RandomStringUtils.randomAlphabetic(6));
+           pizza.setPrice(130);
+           pizzaService.addPizza(pizza);
+        }, "addPizza");
+
+        getPizzaThread.start();
+        addPizzaThread.start();
+
+        List<Pizza> pizzas = null;
+
+        for(int i = 0; i < 10; i++) {
+            if(getPizzasTask.isDone()) {
+                try {
+                    pizzas = (List<Pizza>)getPizzasTask.get();
+                    log.info("GetPizzas ={}", pizzas);
+                    break;
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        if(pizzas == null) {
+            log.warn("Unable to get pizzas from the transaction");
+        }
+        return pizzas;
     }
 }

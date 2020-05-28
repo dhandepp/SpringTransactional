@@ -14,13 +14,13 @@ public class Pizza {
     private String name;
 
     @Column(name = "price")
-    private float price;
+    private Integer price;
 
     public Pizza() {
         super();
     }
 
-    public Pizza(int id, String name, float price) {
+    public Pizza(int id, String name, Integer price) {
         this();
         this.id = id;
         this.name = name;
@@ -43,11 +43,11 @@ public class Pizza {
         this.name = name;
     }
 
-    public float getPrice() {
+    public Integer getPrice() {
         return price;
     }
 
-    public void setPrice(float price) {
+    public void setPrice(Integer price) {
         this.price = price;
     }
 
