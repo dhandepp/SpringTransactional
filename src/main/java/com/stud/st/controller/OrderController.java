@@ -69,6 +69,7 @@ public class OrderController {
                     e.printStackTrace();
                 }
             }
+            Thread.sleep(1000);
         }
         if(pizzas == null) {
             log.warn("Unable to get pizzas from the transaction");

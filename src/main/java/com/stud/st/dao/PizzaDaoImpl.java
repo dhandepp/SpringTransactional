@@ -35,9 +35,9 @@ public class PizzaDaoImpl implements PizzaDao {
             e.printStackTrace();
         }
 
-        log.info("getPizzas(): END");
+        log.info("getPizzas(): getting pizzas one more time");
         result = (List<Pizza>) criteria.list();
-        log.info("getPizzas(): again result={}", result);
+        log.info("getPizzas(): END result={}", result);
         return result;
     }
 
