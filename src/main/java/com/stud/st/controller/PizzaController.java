@@ -1,6 +1,7 @@
 package com.stud.st.controller;
 
 import java.util.List;
+
 import com.stud.st.model.Pizza;
 import com.stud.st.service.PizzaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ public class PizzaController {
     }
 
     @GetMapping(value = "/pizza/{id}", consumes = "application/json")
-    public Pizza getPizza(@PathVariable ("id") int id) {
+    public Pizza getPizza(@PathVariable("id") int id) {
         return pizzaService.getPizza(id);
     }
 
@@ -29,12 +30,12 @@ public class PizzaController {
     }
 
     @PatchMapping(value = "/pizza/{id}", consumes = "application/json")
-    public Pizza updatePizza(@PathVariable ("id") int id, @RequestBody Pizza pizza) {
+    public Pizza updatePizza(@PathVariable("id") int id, @RequestBody Pizza pizza) {
         return pizzaService.updatePizza(id, pizza);
     }
 
     @DeleteMapping("/pizza/{id}")
-    public void deletePizza(@PathVariable ("id") int id) {
+    public void deletePizza(@PathVariable("id") int id) {
         pizzaService.deletePizza(id);
     }
 }

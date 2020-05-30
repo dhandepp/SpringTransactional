@@ -20,6 +20,12 @@ public class Pizza {
         super();
     }
 
+    public Pizza(String name, Integer price) {
+        this();
+        this.name = name;
+        this.price = price;
+    }
+
     public Pizza(int id, String name, Integer price) {
         this();
         this.id = id;

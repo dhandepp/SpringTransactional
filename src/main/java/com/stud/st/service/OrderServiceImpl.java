@@ -31,14 +31,14 @@ public class OrderServiceImpl implements OrderService {
     public Order placeOrder(List<Map<String, Integer>> orderDetails) {
         Order order = new Order();
         StringBuilder sb = new StringBuilder();
-        for(Map<String, Integer> pizzaOrder : orderDetails) {
+        for (Map<String, Integer> pizzaOrder : orderDetails) {
             Pizza pizza = pizzaDao.getPizza(pizzaOrder.get("id"));
             sb.append(pizzaOrder.get("quantity")).append(" x ").append(pizza.getName()).append(", ");
             order.charge(pizzaOrder.get("quantity") * pizza.getPrice());
         }
         order.setOrderDetails(sb.substring(0, sb.length() - 2));
 
-        System.out.println("Final Order= "+ order);
+        System.out.println("Final Order= " + order);
         return orderDao.placeOrder(order);
     }
 }

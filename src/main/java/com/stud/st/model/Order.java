@@ -20,6 +20,12 @@ public class Order {
         super();
     }
 
+    public Order(String orderDetails, float total) {
+        this();
+        this.orderDetails = orderDetails;
+        this.total = total;
+    }
+
     public Order(int id, String orderDetails, float total) {
         this();
         this.id = id;

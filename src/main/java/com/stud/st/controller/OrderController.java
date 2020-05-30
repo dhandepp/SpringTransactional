@@ -1,5 +1,6 @@
 package com.stud.st.controller;
 
+import com.stud.st.dao.OrderDao;
 import com.stud.st.model.Order;
 import com.stud.st.model.Pizza;
 import com.stud.st.service.OrderService;
@@ -23,6 +24,9 @@ public class OrderController {
     OrderService orderService;
 
     @Autowired
+    OrderDao orderDao;
+
+    @Autowired
     PizzaService pizzaService;
 
     @GetMapping(value = "/orders", consumes = "application/json")
@@ -40,18 +44,18 @@ public class OrderController {
         return orderService.placeOrder(orderDetails);
     }
 
-    @GetMapping(value = "/foo")
+    @GetMapping(value = "/isolation")
     public List<Pizza> foo() throws InterruptedException {
 
-        FutureTask getPizzasTask = new FutureTask(()-> pizzaService.getPizzas());
+        FutureTask getPizzasTask = new FutureTask(() -> pizzaService.getPizzas());
 
         Thread getPizzaThread = new Thread(getPizzasTask, "getPizzas");
 
         Thread addPizzaThread = new Thread(() -> {
-           Pizza pizza = new Pizza();
-           pizza.setName(RandomStringUtils.randomAlphabetic(6));
-           pizza.setPrice(130);
-           pizzaService.addPizza(pizza);
+            Pizza pizza = new Pizza();
+            pizza.setName(RandomStringUtils.randomAlphabetic(6));
+            pizza.setPrice(130);
+            pizzaService.addPizza(pizza);
         }, "addPizza");
 
         getPizzaThread.start();
@@ -59,10 +63,10 @@ public class OrderController {
 
         List<Pizza> pizzas = null;
 
-        for(int i = 0; i < 10; i++) {
-            if(getPizzasTask.isDone()) {
+        for (int i = 0; i < 10; i++) {
+            if (getPizzasTask.isDone()) {
                 try {
-                    pizzas = (List<Pizza>)getPizzasTask.get();
+                    pizzas = (List<Pizza>) getPizzasTask.get();
                     log.info("GetPizzas ={}", pizzas);
                     break;
                 } catch (ExecutionException e) {
@@ -71,9 +75,14 @@ public class OrderController {
             }
             Thread.sleep(1000);
         }
-        if(pizzas == null) {
+        if (pizzas == null) {
             log.warn("Unable to get pizzas from the transaction");
         }
         return pizzas;
+    }
+
+    @PostMapping(value = "/propagation")
+    public Order bar(@RequestBody Map<String, String> pizzaWithOrder) {
+        return orderDao.orderPropagation(pizzaWithOrder);
     }
 }

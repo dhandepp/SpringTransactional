@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -27,7 +28,7 @@ public class PizzaDaoImpl implements PizzaDao {
         log.info("getPizzas(): BEGIN");
         Criteria criteria = getSession().createCriteria(Pizza.class);
         criteria.add(Restrictions.lt("price", 500));
-        List<Pizza> result = (List<Pizza>)criteria.list();
+        List<Pizza> result = (List<Pizza>) criteria.list();
         log.info("getPizzas(): result={}", result);
         try {
             Thread.sleep(1000);
@@ -61,7 +62,7 @@ public class PizzaDaoImpl implements PizzaDao {
         log.info("getPizza(): BEGIN");
         Criteria criteria = getSession().createCriteria(Pizza.class);
         criteria.add(Restrictions.lt("price", 500));
-        Pizza pizza = ((List<Pizza>)criteria.list()).get(0);
+        Pizza pizza = ((List<Pizza>) criteria.list()).get(0);
         log.info("getPizza(): END");
         try {
             Thread.sleep(1000);
@@ -69,7 +70,7 @@ public class PizzaDaoImpl implements PizzaDao {
             e.printStackTrace();
         }
 
-        ((List<Pizza>)criteria.list()).get(0);
+        ((List<Pizza>) criteria.list()).get(0);
 
         return pizza;
     }
@@ -89,6 +90,19 @@ public class PizzaDaoImpl implements PizzaDao {
         Query query = getSession().createSQLQuery("delete from pizza where id = :id");
         query.setInteger("id", id);
         query.executeUpdate();
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
+    public Pizza addPizzaWithPropagation(Pizza pizza) throws Exception {
+        if (pizza.getPrice() < 100) {
+            throw new Exception("addPizzaWithPropagation(): Pizza price less than 100, should rollback the transaction");
+        }
+
+        log.info("addPizzaWithPropagation(): BEGIN");
+        pizza = addPizza(pizza);
+        log.info("addPizzaWithPropagation(): END");
+        return pizza;
     }
 
     private Session getSession() {
